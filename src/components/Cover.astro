@@ -1,0 +1,154 @@
+---
+---
+
+<div class="cover-wrapper">
+  <div class="cover-perspective">
+    <div class="cover-strip" data-strip="0">
+      <div class="cover-strip" data-strip="1">
+        <div class="cover-strip" data-strip="2">
+          <div class="cover-strip" data-strip="3">
+            <div class="cover-strip" data-strip="4">
+              <div class="cover-strip" data-strip="5">
+                <section class="cover" aria-label="Brand introduction">
+                  <h1 class="cover__logotype">tszuk</h1>
+                  <p class="cover__tagline">a brand that builds</p>
+                </section>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="cover-spacer"></div>
+
+<script>
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const strips = document.querySelectorAll('.cover-strip') as NodeListOf<HTMLElement>;
+  const cover = document.querySelector('.cover') as HTMLElement;
+
+  if (!prefersReducedMotion && strips.length > 0) {
+    const STRIP_COUNT = strips.length;
+    const stiffness = 0.06;
+    const damping = 0.72;
+    const cascade = 0.7; // how much each strip follows the one before it
+
+    // Each strip has its own spring state
+    const springs = Array.from({ length: STRIP_COUNT }, () => ({
+      current: 0,
+      velocity: 0,
+      target: 0,
+    }));
+
+    function update() {
+      const scrollTarget = Math.min(1, Math.max(0, window.scrollY / 350));
+
+      // Strip 0 (outermost) targets scroll directly
+      // Each subsequent strip targets the previous strip's position, with increasing intensity
+      for (let i = 0; i < STRIP_COUNT; i++) {
+        if (i === 0) {
+          springs[i].target = scrollTarget * 30; // max 30deg per strip
+        } else {
+          springs[i].target = springs[i - 1].current * cascade + scrollTarget * (4 + i * 3);
+        }
+
+        const spring = springs[i];
+        const force = (spring.target - spring.current) * stiffness;
+        spring.velocity += force;
+        spring.velocity *= damping;
+        spring.current += spring.velocity;
+
+        if (Math.abs(spring.velocity) < 0.001 && Math.abs(spring.target - spring.current) < 0.001) {
+          spring.current = spring.target;
+          spring.velocity = 0;
+        }
+
+        strips[i].style.transform = `rotateX(${spring.current}deg)`;
+      }
+
+      // Fade out when heavily bent
+      const totalBend = springs.reduce((sum, s) => sum + s.current, 0);
+      const opacity = Math.max(0, 1 - totalBend / 120);
+      if (cover) {
+        cover.style.opacity = String(opacity);
+      }
+
+      requestAnimationFrame(update);
+    }
+
+    requestAnimationFrame(update);
+  } else if (prefersReducedMotion && cover) {
+    let ticking = false;
+
+    function onScrollReduced() {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          cover.style.opacity = window.scrollY > 0 ? '0' : '1';
+          ticking = false;
+        });
+        ticking = true;
+      }
+    }
+
+    window.addEventListener('scroll', onScrollReduced, { passive: true });
+  }
+</script>
+
+<style>
+  .cover-wrapper {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    pointer-events: none;
+  }
+
+  .cover-perspective {
+    width: 100%;
+    height: 100%;
+    perspective: 1200px;
+    perspective-origin: center top;
+  }
+
+  .cover-strip {
+    width: 100%;
+    height: 100%;
+    transform-origin: top center;
+    transform-style: preserve-3d;
+    will-change: transform;
+  }
+
+  .cover {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100vh;
+    background-color: #c1ffe2;
+    pointer-events: auto;
+    will-change: opacity;
+  }
+
+  .cover__logotype {
+    font-family: var(--font-family);
+    font-weight: var(--font-weight-bold);
+    font-size: clamp(2.5rem, 10vw, 7rem);
+    color: var(--color-text);
+    letter-spacing: -0.02em;
+    margin: 0;
+  }
+
+  .cover__tagline {
+    font-family: var(--font-family);
+    font-weight: var(--font-weight-light);
+    font-size: clamp(0.75rem, 2vw, 1.125rem);
+    color: var(--color-text);
+    letter-spacing: var(--letter-spacing-subtitle);
+    margin-top: 0.75rem;
+  }
+
+  .cover-spacer {
+    height: 50vh;
+  }
+</style>

@@ -1,0 +1,167 @@
+---
+---
+
+<section class="capabilities scroll-reveal" aria-label="Capabilities and services">
+  <h2 class="capabilities__title">What We Do</h2>
+  <div class="capabilities__grid">
+    <div class="capabilities__column">
+      <h3 class="capabilities__heading">Brand Engineering & Strategy</h3>
+      <ul class="capabilities__list">
+        <li>Visual Identity</li>
+        <li>Brand Guidelines</li>
+        <li>Digital & Web Presence</li>
+      </ul>
+    </div>
+    <div class="capabilities__column">
+      <h3 class="capabilities__heading">Creative Management & Roster</h3>
+      <ul class="capabilities__list">
+        <li>360° Brand Direction</li>
+        <li>Campaign & Release Execution</li>
+        <li>Partnerships & Growth</li>
+      </ul>
+    </div>
+    <div class="capabilities__column">
+      <h3 class="capabilities__heading">Digital Product & Experience</h3>
+      <ul class="capabilities__list">
+        <li>Web Design & Development</li>
+        <li>UI/UX Strategy</li>
+        <li>E-Commerce Solutions</li>
+      </ul>
+    </div>
+    <div class="capabilities__column">
+      <h3 class="capabilities__heading">Content & Communications</h3>
+      <ul class="capabilities__list">
+        <li>Creative Copywriting</li>
+        <li>Social Media Direction</li>
+        <li>Visual Storytelling</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<script>
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (!prefersReducedMotion) {
+    const section = document.querySelector('.capabilities') as HTMLElement;
+    if (section) {
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            observer.unobserve(entry.target);
+          }
+        },
+        { threshold: 0.15 }
+      );
+      observer.observe(section);
+    }
+  }
+</script>
+
+<style>
+  .capabilities {
+    padding: var(--section-padding-mobile) 1.5rem;
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transform: translateY(20px);
+    transition:
+      opacity var(--duration-reveal) var(--easing),
+      transform var(--duration-reveal) var(--easing);
+  }
+
+  .capabilities.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .capabilities__title {
+    font-size: clamp(1.25rem, 3vw, 1.5rem);
+    font-weight: var(--font-weight-light);
+    letter-spacing: var(--letter-spacing-subtitle);
+    text-transform: uppercase;
+    color: var(--color-muted);
+    margin-bottom: 3rem;
+    text-align: center;
+  }
+
+  .capabilities__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0;
+    border-top: 1px solid var(--color-divider);
+    width: 100%;
+  }
+
+  .capabilities__column {
+    padding: 2rem 1rem;
+    border-bottom: 1px solid var(--color-divider);
+  }
+
+  .capabilities__heading {
+    font-size: clamp(1.125rem, 2.5vw, 1.375rem);
+    font-weight: var(--font-weight-bold);
+    margin-bottom: 1.25rem;
+  }
+
+  .capabilities__list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .capabilities__list li {
+    font-size: 1rem;
+    color: var(--color-muted);
+    line-height: var(--line-height-body);
+  }
+
+  @media (min-width: 768px) {
+    .capabilities {
+      padding: var(--section-padding) 6rem;
+    }
+
+    .capabilities__grid {
+      grid-template-columns: 1fr 1fr;
+      border-top: none;
+    }
+
+    .capabilities__column {
+      padding: 2.5rem;
+      border-bottom: none;
+    }
+
+    /* Horizontal line between rows */
+    .capabilities__column:nth-child(1),
+    .capabilities__column:nth-child(2) {
+      border-bottom: 1px solid var(--color-divider);
+    }
+
+    /* Vertical line between columns */
+    .capabilities__column:nth-child(odd) {
+      border-right: 1px solid var(--color-divider);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .capabilities__column {
+      padding: 3rem;
+    }
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    .capabilities {
+      opacity: 1;
+      transform: none;
+    }
+  }
+</style>

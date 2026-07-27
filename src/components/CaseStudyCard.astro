@@ -1,0 +1,313 @@
+---
+import { Image } from 'astro:assets';
+
+interface Props {
+  number: string;
+  clientName: string;
+  descriptor: string;
+  scope: string[];
+  image: ImageMetadata;
+  imageAlt: string;
+  link: string;
+  index: number;
+}
+
+const { number, clientName, descriptor, scope, image, imageAlt, link, index } = Astro.props;
+const isReversed = index % 2 === 1;
+---
+
+<article
+  class:list={['card', { 'card--reversed': isReversed }]}
+  style={`--reveal-delay: ${index * 120}ms`}
+>
+  <a href={link} class="card__media" target="_blank" rel="noopener noreferrer" aria-label={`Visit ${clientName}`}>
+    <span class="card__number" aria-hidden="true">{number}</span>
+    <div class="card__image-frame">
+      <Image
+        src={image}
+        alt={imageAlt}
+        width={1200}
+        height={900}
+        class="card__image"
+        loading="lazy"
+      />
+    </div>
+  </a>
+
+  <div class="card__body">
+    <p class="card__descriptor">{descriptor}</p>
+    <h3 class="card__client">{clientName}</h3>
+
+    <ul class="card__scope">
+      {scope.map((item) => <li class="card__scope-item">{item}</li>)}
+    </ul>
+
+    <a href={link} class="card__link" target="_blank" rel="noopener noreferrer">
+      <span>Visit site</span>
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <path
+          d="M2 14L14 2M14 2H5M14 2V11"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </svg>
+    </a>
+  </div>
+</article>
+
+<style>
+  /* ---------- Layout ---------- */
+  .card {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.75rem;
+    align-items: center;
+    opacity: 0;
+    transform: translateY(24px);
+    transition:
+      opacity var(--duration-reveal) var(--easing),
+      transform var(--duration-reveal) var(--easing);
+    transition-delay: var(--reveal-delay, 0ms);
+  }
+
+  .card.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ---------- Media ---------- */
+  .card__media {
+    position: relative;
+    display: block;
+    border-radius: 10px;
+  }
+
+  .card__image-frame {
+    position: relative;
+    overflow: hidden;
+    border-radius: 10px;
+    background-color: var(--color-sage-tint);
+    aspect-ratio: 16 / 9;
+    width: 100%;
+  }
+
+  .card__image {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    will-change: transform;
+    transform: translateY(var(--parallax-y, 0px)) scale(1.06);
+    transition: transform 700ms var(--easing);
+  }
+
+  .card__media:hover .card__image {
+    transform: translateY(var(--parallax-y, 0px)) scale(calc(1.06 * var(--hover-scale)));
+  }
+
+  .card__media::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 10px;
+    background: linear-gradient(
+      to top,
+      rgba(24, 24, 24, 0.28) 0%,
+      transparent 45%
+    );
+    opacity: 0;
+    transition: opacity var(--duration-hover) var(--easing);
+    pointer-events: none;
+  }
+
+  .card__media:hover::after {
+    opacity: 1;
+  }
+
+  .card__number {
+    position: absolute;
+    top: 0.85rem;
+    left: 0.95rem;
+    z-index: 2;
+    font-size: 0.7rem;
+    font-weight: var(--font-weight-bold);
+    letter-spacing: var(--letter-spacing-subtitle);
+    color: var(--color-white);
+    background-color: rgba(24, 24, 24, 0.55);
+    backdrop-filter: blur(6px);
+    padding: 0.3rem 0.6rem;
+    border-radius: 999px;
+    line-height: 1;
+  }
+
+  /* ---------- Body ---------- */
+  .card__body {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .card__descriptor {
+    font-size: 0.72rem;
+    font-weight: var(--font-weight-regular);
+    letter-spacing: var(--letter-spacing-subtitle);
+    text-transform: uppercase;
+    color: var(--color-accent);
+    margin-bottom: 0.6rem;
+  }
+
+  .card__client {
+    font-size: clamp(1.75rem, 5vw, 2.75rem);
+    font-weight: var(--font-weight-bold);
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+    margin-bottom: 1.25rem;
+  }
+
+  .card__scope {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1.75rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .card__scope-item {
+    font-size: 0.78rem;
+    color: var(--color-muted);
+    border: 1px solid var(--color-divider);
+    border-radius: 999px;
+    padding: 0.35rem 0.8rem;
+    line-height: 1;
+    transition:
+      border-color var(--duration-hover) var(--easing),
+      color var(--duration-hover) var(--easing);
+  }
+
+  .card:hover .card__scope-item {
+    border-color: var(--color-accent);
+    color: var(--color-text);
+  }
+
+  .card__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    font-weight: var(--font-weight-bold);
+    letter-spacing: 0.02em;
+    color: var(--color-text);
+    padding-bottom: 0.3rem;
+    border-bottom: 1px solid var(--color-text);
+    transition:
+      color var(--duration-hover) var(--easing),
+      border-color var(--duration-hover) var(--easing),
+      gap var(--duration-hover) var(--easing);
+  }
+
+  .card__link:hover {
+    color: var(--color-accent);
+    border-color: var(--color-accent);
+    gap: 0.8rem;
+  }
+
+  .card__link svg {
+    flex-shrink: 0;
+  }
+
+  /* ---------- Tablet / Desktop ---------- */
+  @media (min-width: 768px) {
+    .card {
+      grid-template-columns: 1.15fr 1fr;
+      gap: 3rem;
+    }
+
+    .card--reversed .card__media {
+      order: 2;
+    }
+
+    .card--reversed .card__body {
+      order: 1;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .card {
+      grid-template-columns: 1.3fr 1fr;
+      gap: 4.5rem;
+    }
+
+    .card__number {
+      top: 1.1rem;
+      left: 1.25rem;
+    }
+  }
+
+  /* ---------- Reduced motion ---------- */
+  @media (prefers-reduced-motion: reduce) {
+    .card {
+      opacity: 1;
+      transform: none;
+    }
+
+    .card__image,
+    .card__media:hover .card__image {
+      transform: none;
+    }
+
+    .card__link:hover {
+      gap: 0.5rem;
+    }
+  }
+</style>
+
+<script>
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (!prefersReducedMotion) {
+    const cards = document.querySelectorAll('.card');
+
+    const revealObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            revealObserver.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.15 }
+    );
+
+    cards.forEach((card) => revealObserver.observe(card));
+
+    // Parallax on card images
+    const images = document.querySelectorAll('.card__image') as NodeListOf<HTMLElement>;
+    let ticking = false;
+
+    function onScroll() {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          const factor = parseFloat(
+            getComputedStyle(document.documentElement).getPropertyValue('--parallax-factor')
+          );
+          images.forEach((img) => {
+            const rect = img.getBoundingClientRect();
+            const offset = (rect.top + rect.height / 2 - window.innerHeight / 2) * factor;
+            img.style.setProperty('--parallax-y', `${offset}px`);
+          });
+          ticking = false;
+        });
+        ticking = true;
+      }
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+  }
+</script>

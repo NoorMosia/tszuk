@@ -1,0 +1,103 @@
+---
+---
+
+<section class="hero scroll-reveal" aria-label="Brand manifesto">
+  <div class="hero__content">
+    <p class="hero__text">
+      tszuk collaborates with
+      <span class="highlight"> luxury brands</span> and
+      <span class="highlight"> artists</span> to build
+      <span class="highlight"> identities that resonate</span>.
+    </p>
+  </div>
+</section>
+
+<script>
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (!prefersReducedMotion) {
+    // Scroll-reveal for the section (one-shot)
+    const hero = document.querySelector('.hero') as HTMLElement;
+    if (hero) {
+      const sectionObserver = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            sectionObserver.unobserve(entry.target);
+          }
+        },
+        { threshold: 0.15 }
+      );
+      sectionObserver.observe(hero);
+    }
+
+    // Highlight effect per span (toggle, not one-shot)
+    const highlights = document.querySelectorAll('.highlight');
+    const highlightObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          entry.target.classList.toggle('highlight--active', entry.isIntersecting);
+        });
+      },
+      { threshold: 0.5 }
+    );
+
+    highlights.forEach((span) => highlightObserver.observe(span));
+  }
+</script>
+
+<style>
+  .hero {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: var(--section-padding-mobile) 1.5rem;
+    background-color: transparent;
+    opacity: 0;
+    transform: translateY(20px);
+    transition:
+      opacity var(--duration-reveal) var(--easing),
+      transform var(--duration-reveal) var(--easing);
+  }
+
+  .hero.visible {
+    opacity: 1;
+    transform: translateY(0);
+    background-color: white;
+    margin-top: -231px;
+  }
+
+  .hero__content {
+    max-width: var(--manifesto-max-width);
+    text-align: center;
+  }
+
+  .hero__text {
+    font-size: clamp(1.25rem, 3vw, 1.75rem);
+    font-weight: var(--font-weight-regular);
+    line-height: var(--line-height-body);
+    color: var(--color-text);
+  }
+
+  .highlight {
+    color: var(--color-muted);
+    transition: color var(--duration-highlight) var(--easing);
+  }
+
+  .highlight--active {
+    color: var(--color-text);
+  }
+
+  /* Reduced motion: show everything immediately */
+  @media (prefers-reduced-motion: reduce) {
+    .hero {
+      opacity: 1;
+      transform: none;
+    }
+
+    .highlight {
+      color: var(--color-text);
+    }
+  }
+</style>

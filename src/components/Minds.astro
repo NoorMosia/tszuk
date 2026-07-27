@@ -1,0 +1,228 @@
+---
+import { Image } from 'astro:assets';
+import zukisa from '../assets/Zukisa.png';
+import tshepo from '../assets/tshepo.png';
+---
+
+<section class="minds scroll-reveal" aria-label="The minds behind tszuk">
+  <h2 class="minds__title">Behind the Brand</h2>
+  <div class="minds__grid">
+    <div class="minds__person">
+      <div class="minds__portrait-wrapper">
+        <div class="minds__blob minds__blob--green" aria-hidden="true"></div>
+        <Image
+          src={zukisa}
+          alt="Zukisa, Co-Founder and Creative Director at tszuk"
+          width={400}
+          height={400}
+          class="minds__portrait"
+          loading="lazy"
+        />
+        <div class="minds__overlay">
+          <span class="minds__tag">Creative Direction</span>
+        </div>
+      </div>
+      <h3 class="minds__name">Zukisa</h3>
+      <p class="minds__role">Co-Founder & Creative Director</p>
+      <p class="minds__qual">Bachelor in Design & Creative Direction</p>
+    </div>
+    <div class="minds__person">
+      <div class="minds__portrait-wrapper">
+        <div class="minds__blob minds__blob--red" aria-hidden="true"></div>
+        <Image
+          src={tshepo}
+          alt="Tshepo, Co-Founder and Systems Director at tszuk"
+          width={400}
+          height={400}
+          class="minds__portrait"
+          loading="lazy"
+        />
+        <div class="minds__overlay">
+          <span class="minds__tag">Systems & Engineering</span>
+        </div>
+      </div>
+      <h3 class="minds__name">Tshepo</h3>
+      <p class="minds__role">Co-Founder & Systems Director</p>
+      <p class="minds__qual">BSc Computer Science & Mathematics</p>
+    </div>
+  </div>
+</section>
+
+<script>
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (!prefersReducedMotion) {
+    const section = document.querySelector('.minds') as HTMLElement;
+    if (section) {
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            observer.unobserve(entry.target);
+          }
+        },
+        { threshold: 0.15 }
+      );
+      observer.observe(section);
+    }
+  }
+</script>
+
+<style>
+  .minds {
+    padding: var(--section-padding-mobile) 1.5rem;
+    width: 100%;
+    opacity: 0;
+    transform: translateY(20px);
+    transition:
+      opacity var(--duration-reveal) var(--easing),
+      transform var(--duration-reveal) var(--easing);
+  }
+
+  .minds.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .minds__title {
+    font-size: clamp(1.25rem, 3vw, 1.5rem);
+    font-weight: var(--font-weight-light);
+    letter-spacing: var(--letter-spacing-subtitle);
+    text-transform: uppercase;
+    color: var(--color-muted);
+    margin-bottom: 4rem;
+    text-align: center;
+  }
+
+  .minds__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 4rem;
+    justify-items: center;
+  }
+
+  .minds__person {
+    text-align: center;
+  }
+
+  .minds__portrait-wrapper {
+    position: relative;
+    display: inline-block;
+    width: 260px;
+    height: 340px;
+    margin-bottom: 1.5rem;
+    background-color: transparent;
+  }
+
+  .minds__blob {
+    position: absolute;
+    left: 10%;
+    right: 10%;
+    top: 15%;
+    bottom: 10%;
+    opacity: 0.35;
+    border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+    animation: blob-morph var(--blob-duration) ease-in-out infinite;
+    z-index: 0;
+  }
+
+  .minds__blob--green {
+    background-color: #88BDA4;
+  }
+
+  .minds__blob--red {
+    background-color: #C47A7A;
+  }
+
+  @keyframes blob-morph {
+    0%, 100% {
+      border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+    }
+    25% {
+      border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%;
+    }
+    50% {
+      border-radius: 50% 60% 30% 60% / 30% 50% 70% 60%;
+    }
+    75% {
+      border-radius: 60% 30% 60% 40% / 70% 40% 50% 60%;
+    }
+  }
+
+  .minds__portrait {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    background-color: transparent;
+  }
+
+  .minds__overlay {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem;
+    background-color: rgba(26, 35, 30, 0.85);
+    border-radius: 4px;
+    opacity: 0;
+    transition: opacity var(--duration-hover) var(--easing);
+  }
+
+  .minds__portrait-wrapper:hover .minds__overlay {
+    opacity: 1;
+  }
+
+  .minds__tag {
+    color: var(--color-white);
+    font-size: 0.85rem;
+    font-weight: var(--font-weight-bold);
+    letter-spacing: var(--letter-spacing-subtitle);
+    text-transform: uppercase;
+  }
+
+  .minds__name {
+    font-size: 1.5rem;
+    font-weight: var(--font-weight-bold);
+    margin-bottom: 0.25rem;
+  }
+
+  .minds__role {
+    font-size: 0.95rem;
+    color: var(--color-muted);
+    margin-bottom: 0.25rem;
+  }
+
+  .minds__qual {
+    font-size: 0.85rem;
+    color: var(--color-muted);
+  }
+
+  @media (min-width: 768px) {
+    .minds {
+      padding: var(--section-padding) 6rem;
+    }
+
+    .minds__grid {
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+    }
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    .minds {
+      opacity: 1;
+      transform: none;
+    }
+
+    .minds__blob {
+      animation: none;
+    }
+  }
+</style>

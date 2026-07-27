@@ -1,0 +1,99 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Cover from '../components/Cover.astro';
+import Hero from '../components/Hero.astro';
+import CaseStudyCard from '../components/CaseStudyCard.astro';
+import Marquee from '../components/Marquee.astro';
+import Capabilities from '../components/Capabilities.astro';
+import Minds from '../components/Minds.astro';
+import Footer from '../components/Footer.astro';
+import artist from '../assets/artist.jpg';
+import company from '../assets/company.jpg';
+---
+
+<Layout title="tszuk — a brand that builds">
+  <Cover />
+  <main>
+    <Hero />
+    <section class="work" aria-label="Our work">
+      <div class="work__header">
+        <h2 class="work__heading">Our Work</h2>
+      </div>
+      <div class="work__cards">
+        <CaseStudyCard
+          number="01"
+          clientName="Boss Reminisce"
+          descriptor="singer/songwriter"
+          scope={["Web presence", "Strategic partnership", "Brand management"]}
+          image={artist}
+          imageAlt="Boss Reminisce artist branding project by tszuk"
+          link="#"
+          index={0}
+        />
+        <CaseStudyCard
+          number="02"
+          clientName="Sunset Retreat"
+          descriptor="hospitality"
+          scope={["Logo", "Brand identity", "Website"]}
+          image={company}
+          imageAlt="Sunset Retreat hospitality branding project by tszuk"
+          link="#"
+          index={1}
+        />
+      </div>
+    </section>
+    <Marquee />
+    <Capabilities />
+    <Minds />
+  </main>
+  <Footer />
+</Layout>
+
+<style>
+  main {
+    position: relative;
+    z-index: 1;
+    background-color: #F7F7F6;
+  }
+
+  .work {
+    padding: var(--section-padding-mobile) 1.5rem;
+    width: 100%;
+    text-align: center;
+  }
+
+  .work__header {
+    margin-bottom: 3rem;
+  }
+
+  .work__heading {
+    font-size: clamp(1.25rem, 3vw, 1.5rem);
+    font-weight: var(--font-weight-light);
+    letter-spacing: var(--letter-spacing-subtitle);
+    text-transform: uppercase;
+    color: var(--color-muted);
+    margin-bottom: 48px;
+  }
+
+  .work__cards {
+    display: grid;
+    gap: 4.5rem;
+    text-align: left;
+  }
+
+  @media (min-width: 768px) {
+    .work {
+      padding: var(--section-padding) 6rem;
+    }
+
+    .work__cards {
+      gap: 6rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .work__cards {
+      gap: 8rem;
+    }
+  }
+</style>

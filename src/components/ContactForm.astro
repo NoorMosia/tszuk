@@ -1,0 +1,224 @@
+---
+---
+
+<form class="contact-form" novalidate>
+  <div class="contact-form__field">
+    <label for="contact-name" class="contact-form__label">Name</label>
+    <input
+      type="text"
+      id="contact-name"
+      name="name"
+      required
+      autocomplete="name"
+      class="contact-form__input"
+    />
+  </div>
+
+  <div class="contact-form__field">
+    <label for="contact-email" class="contact-form__label">Email</label>
+    <input
+      type="email"
+      id="contact-email"
+      name="email"
+      required
+      autocomplete="email"
+      class="contact-form__input"
+    />
+  </div>
+
+  <fieldset class="contact-form__fieldset">
+    <legend class="contact-form__label">Project Type</legend>
+    <div class="contact-form__radios">
+      <label class="contact-form__radio">
+        <input type="radio" name="projectType" value="brand-identity-web" />
+        <span>Brand Identity/Web</span>
+      </label>
+      <label class="contact-form__radio">
+        <input type="radio" name="projectType" value="artist-management" />
+        <span>Artist Management</span>
+      </label>
+      <label class="contact-form__radio">
+        <input type="radio" name="projectType" value="other" checked />
+        <span>Other</span>
+      </label>
+    </div>
+  </fieldset>
+
+  <div class="contact-form__field">
+    <label for="contact-message" class="contact-form__label">Message</label>
+    <textarea
+      id="contact-message"
+      name="message"
+      required
+      rows="5"
+      class="contact-form__input contact-form__textarea"
+    ></textarea>
+  </div>
+
+  <button type="submit" class="contact-form__submit">Send Inquiry</button>
+
+  <div class="contact-form__status" aria-live="polite"></div>
+</form>
+
+<script>
+  const form = document.querySelector('.contact-form') as HTMLFormElement;
+  const status = document.querySelector('.contact-form__status') as HTMLElement;
+
+  if (form) {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const name = (form.querySelector('[name="name"]') as HTMLInputElement).value.trim();
+      const email = (form.querySelector('[name="email"]') as HTMLInputElement).value.trim();
+      const message = (form.querySelector('[name="message"]') as HTMLTextAreaElement).value.trim();
+      const projectType = (form.querySelector('[name="projectType"]:checked') as HTMLInputElement)?.value || 'other';
+
+      // Client-side validation
+      if (!name || !email || !message) {
+        status.textContent = 'Please fill in all required fields.';
+        status.className = 'contact-form__status contact-form__status--error';
+        return;
+      }
+
+      // Show loading state
+      const submitBtn = form.querySelector('.contact-form__submit') as HTMLButtonElement;
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Sending...';
+      status.textContent = '';
+      status.className = 'contact-form__status';
+
+      try {
+        const res = await fetch('/api/contact', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, message, projectType }),
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          status.textContent = 'Inquiry received. We will be in touch shortly.';
+          status.className = 'contact-form__status contact-form__status--success';
+          form.reset();
+        } else {
+          status.textContent = data.error || 'Something went wrong. Please try again.';
+          status.className = 'contact-form__status contact-form__status--error';
+        }
+      } catch {
+        status.textContent = 'Something went wrong. Please try again.';
+        status.className = 'contact-form__status contact-form__status--error';
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Send Inquiry';
+      }
+    });
+  }
+</script>
+
+<style>
+  .contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    max-width: 500px;
+  }
+
+  .contact-form__field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .contact-form__label {
+    font-size: 0.85rem;
+    font-weight: var(--font-weight-bold);
+    color: var(--color-white);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .contact-form__input {
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    padding: 0.75rem 0;
+    font-family: var(--font-family);
+    font-size: 1rem;
+    color: var(--color-white);
+    transition: border-color var(--duration-hover) var(--easing);
+  }
+
+  .contact-form__input:focus-visible {
+    outline: none;
+    border-bottom-color: var(--color-accent);
+  }
+
+  .contact-form__textarea {
+    resize: vertical;
+    min-height: 120px;
+  }
+
+  .contact-form__fieldset {
+    border: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .contact-form__radios {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: 0.5rem;
+  }
+
+  .contact-form__radio {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.8);
+    cursor: pointer;
+  }
+
+  .contact-form__radio input[type="radio"] {
+    accent-color: var(--color-accent);
+  }
+
+  .contact-form__submit {
+    align-self: flex-start;
+    padding: 0.875rem 2rem;
+    background-color: var(--color-accent);
+    color: var(--color-dark);
+    font-weight: var(--font-weight-bold);
+    font-size: 0.9rem;
+    letter-spacing: 0.05em;
+    border-radius: 4px;
+    transition:
+      background-color var(--duration-hover) var(--easing),
+      transform var(--duration-hover) var(--easing);
+  }
+
+  .contact-form__submit:hover {
+    background-color: #9dcdb4;
+    transform: translateY(-1px);
+  }
+
+  .contact-form__submit:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .contact-form__status {
+    font-size: 0.9rem;
+    min-height: 1.4em;
+  }
+
+  .contact-form__status--success {
+    color: var(--color-accent);
+  }
+
+  .contact-form__status--error {
+    color: #e57373;
+  }
+</style>
