@@ -289,25 +289,49 @@ const isReversed = index % 2 === 1;
     // Parallax on card images
     const images = document.querySelectorAll('.card__image') as NodeListOf<HTMLElement>;
     let ticking = false;
+    let rafId = 0;
 
-    function onScroll() {
+    function updateParallax() {
+      const factor = parseFloat(
+        getComputedStyle(document.documentElement).getPropertyValue('--parallax-factor')
+      );
+      const smoothScroll = (window as any).__smoothScroll;
+      const useSmooth = smoothScroll?.enabled;
+
+      images.forEach((img) => {
+        const rect = img.getBoundingClientRect();
+        // When smooth scroll is active, blend the parallax with the scroll lag
+        // This makes images drift slightly behind — a buttery effect
+        const scrollDelta = useSmooth ? (smoothScroll.target - smoothScroll.current) * factor : 0;
+        const offset = (rect.top + rect.height / 2 - window.innerHeight / 2) * factor - scrollDelta;
+        img.style.setProperty('--parallax-y', `${offset}px`);
+      });
+      ticking = false;
+    }
+
+    function onScrollParallax() {
       if (!ticking) {
-        requestAnimationFrame(() => {
-          const factor = parseFloat(
-            getComputedStyle(document.documentElement).getPropertyValue('--parallax-factor')
-          );
-          images.forEach((img) => {
-            const rect = img.getBoundingClientRect();
-            const offset = (rect.top + rect.height / 2 - window.innerHeight / 2) * factor;
-            img.style.setProperty('--parallax-y', `${offset}px`);
-          });
-          ticking = false;
-        });
         ticking = true;
+        rafId = requestAnimationFrame(updateParallax);
       }
     }
 
-    window.addEventListener('scroll', onScroll, { passive: true });
-    onScroll();
+    // When smooth scroll is running, we need continuous updates (not just on scroll events)
+    function parallaxLoop() {
+      const smoothScroll = (window as any).__smoothScroll;
+      if (smoothScroll?.active) {
+        updateParallax();
+      }
+      requestAnimationFrame(parallaxLoop);
+    }
+
+    window.addEventListener('scroll', onScrollParallax, { passive: true });
+    updateParallax();
+
+    // Start continuous loop if smooth scroll is enabled
+    const smoothScroll = (window as any).__smoothScroll;
+    if (smoothScroll?.enabled) {
+      requestAnimationFrame(parallaxLoop);
+    }
   }
 </script>

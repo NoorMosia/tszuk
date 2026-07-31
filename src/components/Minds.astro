@@ -108,10 +108,12 @@ import tshepo from '../assets/tshepo.png';
   .minds__portrait-wrapper {
     position: relative;
     display: inline-block;
-    width: 260px;
-    height: 340px;
+    width: 280px;
+    height: 280px;
     margin-bottom: 1.5rem;
     background-color: transparent;
+    border-radius: 50%;
+    overflow: hidden;
   }
 
   .minds__blob {
@@ -154,28 +156,35 @@ import tshepo from '../assets/tshepo.png';
     z-index: 1;
     width: 100%;
     height: 100%;
-    object-fit: contain;
+    object-fit: cover;
     background-color: transparent;
+    transition: transform var(--duration-hover) var(--easing);
+  }
+
+  .minds__portrait-wrapper:hover .minds__portrait {
+    transform: scale(1.08);
   }
 
   .minds__overlay {
     position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    inset: 0;
     z-index: 2;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 0.75rem;
-    background-color: rgba(26, 35, 30, 0.85);
-    border-radius: 4px;
+    background-color: rgba(26, 35, 30, 0.75);
+    border-radius: 50%;
     opacity: 0;
-    transition: opacity var(--duration-hover) var(--easing);
+    transform: scale(0.85);
+    backdrop-filter: blur(2px);
+    transition:
+      opacity var(--duration-hover) var(--easing),
+      transform var(--duration-hover) var(--easing);
   }
 
   .minds__portrait-wrapper:hover .minds__overlay {
     opacity: 1;
+    transform: scale(1);
   }
 
   .minds__tag {

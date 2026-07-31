@@ -1,0 +1,107 @@
+---
+/**
+ * SmoothScroll — global lerp-based scroll smoothing.
+ *
+ * Exposes a smoothed scrollY value on `window.__smoothScroll` that other
+ * components can read instead of raw `window.scrollY`. Native scrolling
+ * is untouched — no scroll hijacking, no wrapper transforms.
+ *
+ * The lerp factor gives a subtle lag (silk-smooth, not sluggish).
+ * Disabled on touch devices and when prefers-reduced-motion is active.
+ */
+---
+
+<script>
+  (function initSmoothScroll() {
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+
+    interface SmoothScrollState {
+      current: number;
+      target: number;
+      velocity: number;
+      running: boolean;
+    }
+
+    const state: SmoothScrollState = {
+      current: window.scrollY,
+      target: window.scrollY,
+      velocity: 0,
+      running: false,
+    };
+
+    // Lerp factor: 0.08–0.12 for silk, higher = snappier
+    const LERP = 0.09;
+    // Slight spring tension for organic feel at the tail end
+    const SPRING = 0.015;
+    const DAMPING = 0.85;
+    // Threshold to snap and stop the loop
+    const EPSILON = 0.5;
+
+    function tick() {
+      state.target = window.scrollY;
+
+      const diff = state.target - state.current;
+
+      // Hybrid: lerp for the bulk of the motion, spring nudge at the tail
+      const lerpForce = diff * LERP;
+      const springForce = diff * SPRING;
+      state.velocity = (state.velocity + springForce) * DAMPING;
+
+      state.current += lerpForce + state.velocity;
+
+      // Snap when close enough
+      if (Math.abs(diff) < EPSILON && Math.abs(state.velocity) < 0.1) {
+        state.current = state.target;
+        state.velocity = 0;
+        state.running = false;
+        return;
+      }
+
+      state.running = true;
+      requestAnimationFrame(tick);
+    }
+
+    function onScroll() {
+      state.target = window.scrollY;
+      if (!state.running) {
+        state.running = true;
+        requestAnimationFrame(tick);
+      }
+    }
+
+    // Public API
+    const api = {
+      /** The smoothed scroll position */
+      get current() {
+        return state.current;
+      },
+      /** The actual (target) scroll position */
+      get target() {
+        return state.target;
+      },
+      /** Whether the smooth loop is active */
+      get active() {
+        return state.running;
+      },
+      /** Whether smooth scrolling is enabled */
+      enabled: false,
+    };
+
+    if (!prefersReducedMotion && !isTouchDevice) {
+      api.enabled = true;
+      window.addEventListener('scroll', onScroll, { passive: true });
+      // Kick off initial frame
+      state.running = true;
+      requestAnimationFrame(tick);
+    } else {
+      // Fallback: current always equals real scrollY
+      Object.defineProperty(api, 'current', {
+        get() { return window.scrollY; },
+      });
+    }
+
+    // Expose globally for other components
+    (window as any).__smoothScroll = api;
+  })();
+</script>

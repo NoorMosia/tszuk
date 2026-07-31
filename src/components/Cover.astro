@@ -42,7 +42,9 @@
     }));
 
     function update() {
-      const scrollTarget = Math.min(1, Math.max(0, window.scrollY / 350));
+      const smoothScroll = (window as any).__smoothScroll;
+      const scrollY = smoothScroll?.enabled ? smoothScroll.current : window.scrollY;
+      const scrollTarget = Math.min(1, Math.max(0, scrollY / 350));
 
       // Strip 0 (outermost) targets scroll directly
       // Each subsequent strip targets the previous strip's position, with increasing intensity

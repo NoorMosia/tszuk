@@ -36,6 +36,10 @@
   --cover-flip-threshold: 300px;
   --parallax-factor: 0.05;
   --hover-scale: 1.03;
+
+  /* Smooth Scroll */
+  --smooth-scroll-lerp: 0.09;
+  --smooth-scroll-spring: 0.015;
 }
 
 /* === Reduced Motion === */
